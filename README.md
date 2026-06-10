@@ -17,3 +17,23 @@ Enterprise Authentication System built using MERN Stack.
 ## Status
 
 🚧 In Development
+
+## Key Learnings
+
+### ApiResponse Utility
+
+While building AuthHub, I learned the importance of standardizing API responses.
+
+Initially, controllers returned different response formats. To improve consistency and frontend integration, I implemented an ApiResponse utility that ensures every endpoint returns:
+
+{
+  "success": true,
+  "message": "...",
+  "data": {}
+}
+
+Benefits:
+- Consistent API contract
+- Easier frontend development
+- Cleaner controller code
+- Improved maintainability
