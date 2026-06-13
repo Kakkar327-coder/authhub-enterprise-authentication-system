@@ -85,3 +85,45 @@ exports.login = async (req, res) => {
     );
   }
 };
+
+exports.refreshToken =
+ async(req,res)=>{
+
+ try{
+
+ const {
+  refreshToken
+ } = req.body;
+
+ const decoded =
+ jwt.verify(
+  refreshToken,
+  process.env
+  .JWT_REFRESH_SECRET
+ );
+
+ const accessToken =
+ jwt.sign(
+  {
+   id:decoded.id
+  },
+  process.env.JWT_SECRET,
+  {
+   expiresIn:"15m"
+  }
+ );
+
+ return res.json({
+  accessToken
+ });
+
+ }catch(error){
+
+  return res.status(401)
+  .json({
+   message:
+   "Invalid refresh token"
+  });
+
+ }
+};
