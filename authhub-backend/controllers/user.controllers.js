@@ -67,14 +67,28 @@ const reset=async(req,resp)=>{
         newAccToken
     })
 }
-const forget=async(req,resp)=>{
-    const data=await ServiceData.Forgot(req.body.email)
-    resp.json(data)
-}
-const resetPassword=async(req,resp)=>{
-    const data=await ServiceData.reset(req)
-    resp.json(data)
-}
+const forget = async (req, resp) => {
+  try {
+    const data = await ServiceData.Forgot(req.body.email);
+    resp.json(data);
+  } catch (err) {
+    resp.status(400).json({
+      success: false,
+      message: err.message || "Failed to process forgot password request",
+    });
+  }
+};
+const resetPassword = async (req, resp) => {
+  try {
+    const data = await ServiceData.reset(req);
+    resp.json(data);
+  } catch (err) {
+    resp.status(400).json({
+      success: false,
+      message: err.message || "Reset password failed",
+    });
+  }
+};
 
 module.exports={
     Getdata,
