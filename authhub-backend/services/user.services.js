@@ -133,6 +133,10 @@ const Deletingdata = async (id) => {
 };
 
 const Signup = async (data) => {
+  const existingUser = await User.findOne({ email: data.email });
+  if (existingUser) {
+    throw new Error("User already exists");
+  }
   return await User.create(data);
 };
 
