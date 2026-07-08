@@ -188,7 +188,8 @@ const Forgot = async (email) => {
   user.resetPasswordExpire = Date.now() + 1000 * 60 * 60; // 1 hour
   await user.save();
 
-  const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
 
   await Transporter.sendMail({
     from: process.env.MAIL,
