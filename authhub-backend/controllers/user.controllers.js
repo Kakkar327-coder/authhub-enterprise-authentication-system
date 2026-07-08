@@ -24,14 +24,28 @@ const Deletedata=async(req,resp)=>{
     const data=await ServiceData.Deletingdata(req.params.id)
     resp.json(data)
 }
-const signup=async(req,resp)=>{
-    const data=await ServiceData.Signup(req.body)
-    resp.json(data)
-}
-const login=async(req,resp)=>{
-    const data=await ServiceData.Login(req.body.email,req.body.password)
-    resp.json(data)
-}
+const signup = async (req, resp) => {
+  try {
+    const data = await ServiceData.Signup(req.body);
+    resp.json(data);
+  } catch (err) {
+    resp.status(400).json({
+      success: false,
+      message: err.message || "Signup failed",
+    });
+  }
+};
+const login = async (req, resp) => {
+  try {
+    const data = await ServiceData.Login(req.body.email, req.body.password);
+    resp.json(data);
+  } catch (err) {
+    resp.status(400).json({
+      success: false,
+      message: err.message || "Login failed",
+    });
+  }
+};
 const reset=async(req,resp)=>{
     const authHeader=req.headers.authorization
     if(!authHeader || !authHeader.startsWith('Bearer ')){
