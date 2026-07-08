@@ -191,6 +191,10 @@ const Forgot = async (email) => {
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
   const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
 
+  if (!process.env.MAIL || !process.env.PASSI) {
+    throw new Error("SMTP email service is not configured on the server. Please check the MAIL and PASSI environment variables.");
+  }
+
   await Transporter.sendMail({
     from: process.env.MAIL,
     to: user.email,
