@@ -69,7 +69,8 @@ const reset=async(req,resp)=>{
 }
 const forget = async (req, resp) => {
   try {
-    const data = await ServiceData.Forgot(req.body.email);
+    const origin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null);
+    const data = await ServiceData.Forgot(req.body.email, origin);
     resp.json(data);
   } catch (err) {
     resp.status(400).json({

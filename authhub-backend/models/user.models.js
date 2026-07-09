@@ -7,11 +7,18 @@ const UserSchema=new mongoose.Schema({
     role:{
         type:String,
         enum:["user","admin"],
-        default:"user"
+        default:"user",
+        lowercase:true
     },
     resetPasswordToken:String,
     resetPasswordExpire:Date
 })
+
+UserSchema.pre("validate", function() {
+    if (this.role) {
+        this.role = this.role.toLowerCase();
+    }
+});
 
 UserSchema.pre("save",async function(){
     if(!this.isModified("password")) return

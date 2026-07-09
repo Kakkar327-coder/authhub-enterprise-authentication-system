@@ -171,7 +171,7 @@ const Login = async (email, password) => {
   };
 };
 
-const Forgot = async (email) => {
+const Forgot = async (email, origin) => {
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -188,7 +188,7 @@ const Forgot = async (email) => {
   user.resetPasswordExpire = Date.now() + 1000 * 60 * 60; // 1 hour
   await user.save();
 
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  const frontendUrl = origin || process.env.FRONTEND_URL || "http://localhost:5173";
   const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
 
   if (!process.env.MAIL || !process.env.PASSI) {
