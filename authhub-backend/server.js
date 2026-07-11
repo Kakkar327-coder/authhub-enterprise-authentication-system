@@ -21,6 +21,8 @@ async function connectdb(){
 connectdb()
 
 app.use("/api/v1/data",router)
+// console.log("MAIL =", process.env.MAIL);
+// console.log("PASSI =", process.env.PASSI);
 console.log("MAIL =", process.env.MAIL);
-console.log("PASSI =", process.env.PASSI);
+console.log("BREVO_API_KEY set =", Boolean(process.env.BREVO_API_KEY));
 app.listen(process.env.PORT)
