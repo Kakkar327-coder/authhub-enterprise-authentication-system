@@ -111,7 +111,8 @@ const User = require("../models/user.models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const Transporter = require("../utility/Email");
+const { sendMail } = require("../utility/Email");
+// const Transporter = require("../utility/Email");
 
 const Getingdata = async () => {
   return await User.find({});
@@ -191,16 +192,32 @@ const Forgot = async (email, origin) => {
   const frontendUrl = origin || process.env.FRONTEND_URL || "http://localhost:5173";
   const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
 
-  if (!process.env.MAIL || !process.env.PASSI) {
-    throw new Error("SMTP email service is not configured on the server. Please check the MAIL and PASSI environment variables.");
-  }
+  // if (!process.env.MAIL || !process.env.PASSI) {
+  //   throw new Error("SMTP email service is not configured on the server. Please check the MAIL and PASSI environment variables.");
+  // }
+await sendMail({
+  to: user.email,
+  subject: "Password Reset",
+  text: `You can reset your password using this link: ${resetLink}`,
+  html: `<p>You can reset your password using this link: <a href="${resetLink}">${resetLink}</a></p>`,
+});
+  // await Transporter.sendMail({
+  //   from: process.env.MAIL,
+  //   to: user.email,
+  //   subject: "Password Reset",
+  //   text: `You can reset your password using this link: ${resetLink}`,
+  // });
 
-  await Transporter.sendMail({
-    from: process.env.MAIL,
-    to: user.email,
-    subject: "Password Reset",
-    text: `You can reset your password using this link: ${resetLink}`,
-  });
+  // if (!process.env.MAIL || !process.env.PASSI) {
+  //   throw new Error("SMTP email service is not configured on the server. Please check the MAIL and PASSI environment variables.");
+  // }
+
+  // await Transporter.sendMail({
+  //   from: process.env.MAIL,
+  //   to: user.email,
+  //   subject: "Password Reset",
+  //   text: `You can reset your password using this link: ${resetLink}`,
+  // });
 
   console.log("Reset Token:", resetToken);
   console.log("Hashed Saved:", hashedToken);

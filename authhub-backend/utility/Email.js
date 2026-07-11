@@ -1,15 +1,41 @@
-const nodemailer=require('nodemailer')
-const Transporter=nodemailer.createTransport({
-    service:'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth:{
-        user:process.env.MAIL,
-        pass:process.env.PASSI
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+
+async function sendMail({ to, subject, text, html }) {
+  if (!process.env.BREVO_API_KEY) {
+    throw new Error("Email service is not configured on the server. Please set BREVO_API_KEY.");
+  }
+  if (!process.env.MAIL) {
+    throw new Error("Email service is not configured on the server. Please set MAIL (verified sender email).");
+  }
+
+  const response = await fetch(BREVO_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "api-key": process.env.BREVO_API_KEY,
     },
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,   // 10 seconds
-    socketTimeout: 10000      // 10 seconds
-})
-module.exports=Transporter
+    body: JSON.stringify({
+      sender: { name: "AuthHub", email: process.env.MAIL },
+      to: [{ email: to }],
+      subject,
+      textContent: text,
+      htmlContent: html || undefined,
+    }),
+  });
+
+  if (!response.ok) {
+    let details = "";
+    try {
+      const errBody = await response.json();
+      details = errBody.message || JSON.stringify(errBody);
+    } catch {
+      details = await response.text();
+    }
+    throw new Error(`Failed to send email via Brevo: ${details}`);
+  }
+
+  return response.json();
+}
+
+module.exports = { sendMail };
