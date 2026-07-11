@@ -8,7 +8,7 @@ AuthHub is an Enterprise Authentication System built using the **MERN (MongoDB, 
 
 *   **Secure Authentication**: JWT-based authentication using dynamic access and refresh tokens.
 *   **Password Security**: Industry-standard password hashing using `bcrypt` pre-save hooks.
-*   **Password Recovery**: Email reset links powered by `nodemailer` and custom cryptographically secure tokens.
+*   **Password Recovery**: Email reset links powered by the **Brevo Transactional Email API** (HTTPS-based, no SMTP ports required) and custom cryptographically secure tokens.
 *   **Premium Visual Design**: Cyber-obsidian dark theme built with `Plus Jakarta Sans` typography, high-precision glassmorphism elements, and glowing interactive hover effects.
 *   **Consistent API Layer**: Implemented standardized `ApiResponse` contracts for clean, predictable integration between the React frontend and Express controllers.
 *   **Modular Architecture**: Clean separation of routes, models, controllers, and services on the backend.
@@ -23,7 +23,7 @@ AuthHub is an Enterprise Authentication System built using the **MERN (MongoDB, 
 │   ├── models/                # MongoDB user schemas and middleware
 │   ├── routes/                # Endpoint routing path definitions
 │   ├── services/              # Business logic & authentication algorithms
-│   ├── utility/               # Helper modules (email transporter)
+│   ├── utility/               # Helper modules (Brevo email sender)
 │   └── server.js              # Server entry point
 │
 ├── authhub-frontend/my-app/   # Vite + React Frontend Client
@@ -45,9 +45,17 @@ MONGO_URI=mongodb+srv://...           # MongoDB database connection string
 PORT=3000                             # Express server port
 ACC_KEY=...                          # JWT access token secret key
 SEC_KEY=...                          # JWT refresh token secret key
-MAIL=...                              # Nodemailer host email address
-PASSI=...                             # Nodemailer app-specific password
+MAIL=...                              # Verified Brevo sender email address
+BREVO_API_KEY=...                     # Brevo transactional email API key
+FRONTEND_URL=...                      # Frontend origin used to build reset links (e.g. http://localhost:5173)
 ```
+
+> **Note:** Password reset emails are sent via the [Brevo](https://www.brevo.com/) HTTP API rather than raw SMTP. This is intentional — Render's free tier blocks outbound SMTP ports (25/465/587), so `nodemailer`-style SMTP sending times out in production even though it works locally. Brevo sends over plain HTTPS, so it works on any host.
+>
+> To set this up:
+> 1. Create a free account at [brevo.com](https://www.brevo.com/).
+> 2. Verify a single sender email (use the same address as `MAIL`) under **Senders, Domains & Dedicated IPs**.
+> 3. Generate an API key under your profile → **SMTP & API** → **API Keys**, and set it as `BREVO_API_KEY`.
 
 ---
 
@@ -76,5 +84,7 @@ The frontend client launches on `http://localhost:5173`.
 
 ## 🌐 Production Deployment
 
-*   **Frontend**: Ready for edge hosting on **Vercel** with the `VITE_API_URL` environment variable.
-*   **Backend**: Ready to deploy as a Web Service on **Render** (configure all environment variables in the Render dashboard).
+*   **Frontend**: Deployed on **Vercel** with the `VITE_API_URL` environment variable pointing at the live backend.
+*   **Backend**: Deployed as a Web Service on **Render**. All environment variables (`MONGO_URI`, `ACC_KEY`, `SEC_KEY`, `MAIL`, `BREVO_API_KEY`, `FRONTEND_URL`) must be configured directly in the Render dashboard under **Environment** — `.env` files are gitignored and are not deployed automatically.
+
+> ⚠️ Do **not** use `nodemailer`/SMTP for email on Render's free tier — outbound SMTP ports are blocked, which causes password-reset emails to fail with a connection timeout. Use the Brevo API integration described above instead.
